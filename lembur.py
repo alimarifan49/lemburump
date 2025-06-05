@@ -15,14 +15,17 @@ def hitung_lembur():
             continue
 
         try:
+            nomor = parts[0]
             tanggal_str = parts[1]
+            jam_masuk = parts[2]
             jam_pulang_str = parts[3]
+            keterangan = " ".join(parts[4:])
+
             tanggal = datetime.strptime(tanggal_str, "%Y-%m-%d")
             jam_pulang = datetime.strptime(jam_pulang_str, "%H:%M")
 
             hari = tanggal.weekday()  # 0=Senin ... 4=Jumat
 
-            # Jam pulang default
             if hari == 4:  # Jumat
                 jam_batas = datetime.strptime("15:00", "%H:%M")
             else:
@@ -35,21 +38,22 @@ def hitung_lembur():
                 total_jam += jam
                 total_menit += menit
             else:
-                jam, menit = 0, 0
+                jam = 0
+                menit = 0
 
-            hari_str = ""
-            if hari == 4:  # Jumat
-                hari_str = " # Jumat"
+            output_line = f"{nomor}\t{tanggal_str}\t{jam_masuk}\t{jam_pulang_str}\t{keterangan}\t{jam} jam {menit} menit"
+            if hari == 4:
+                output_line += " # Jumat"
+            output_line += "\n"
+            output_text.insert(tk.END, output_line)
 
-            output_text.insert(tk.END, f"{baris} {jam} jam {menit} menit{hari_str}\n")
-        except Exception as e:
+        except Exception:
             output_text.insert(tk.END, f"Format error di baris: {baris}\n")
 
-    # Konversi total menit ke jam jika lebih dari 60
     total_jam += total_menit // 60
     total_menit = total_menit % 60
 
-    output_text.insert(tk.END, f"\nTOTAL LEMBUR = {total_jam} jam {total_menit} menit")
+    output_text.insert(tk.END, f"\nTOTAL LEMBUR = {total_jam} jam {total_menit} menit\n")
 
 def show_about():
     messagebox.showinfo("About", "Develop by broAli dev\nalimarifan49@gmail.com")
@@ -58,7 +62,7 @@ def show_about():
 root = tk.Tk()
 root.title("Aplikasi Hitung Jam Lembur")
 
-# Membuat menu bar
+# Menu Bar
 menubar = tk.Menu(root)
 root.config(menu=menubar)
 
