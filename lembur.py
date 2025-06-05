@@ -26,20 +26,25 @@ def hitung_lembur():
 
             hari = tanggal.weekday()  # 0=Senin ... 4=Jumat
 
-            if hari == 4:  # Jumat
-                jam_batas = datetime.strptime("15:00", "%H:%M")
-            else:
-                jam_batas = datetime.strptime("16:00", "%H:%M")
-
-            if jam_pulang > jam_batas:
-                lembur = jam_pulang - jam_batas
-                jam = lembur.seconds // 3600
-                menit = (lembur.seconds % 3600) // 60
-                total_jam += jam
-                total_menit += menit
-            else:
+            # Jika TERLAMBAT maka lembur otomatis 0
+            if "Terlambat" in keterangan:
                 jam = 0
                 menit = 0
+            else:
+                if hari == 4:  # Jumat
+                    jam_batas = datetime.strptime("15:00", "%H:%M")
+                else:
+                    jam_batas = datetime.strptime("16:00", "%H:%M")
+
+                if jam_pulang > jam_batas:
+                    lembur = jam_pulang - jam_batas
+                    jam = lembur.seconds // 3600
+                    menit = (lembur.seconds % 3600) // 60
+                    total_jam += jam
+                    total_menit += menit
+                else:
+                    jam = 0
+                    menit = 0
 
             output_line = f"{nomor}\t{tanggal_str}\t{jam_masuk}\t{jam_pulang_str}\t{keterangan}\t{jam} jam {menit} menit"
             if hari == 4:
@@ -50,6 +55,7 @@ def hitung_lembur():
         except Exception:
             output_text.insert(tk.END, f"Format error di baris: {baris}\n")
 
+    # Konversi total menit ke jam
     total_jam += total_menit // 60
     total_menit = total_menit % 60
 
@@ -71,15 +77,17 @@ menu_help = tk.Menu(menubar, tearoff=0)
 menu_help.add_command(label="About", command=show_about)
 menubar.add_cascade(label="Help", menu=menu_help)
 
+# Input section
 tk.Label(root, text="Paste Data Absen:").pack()
-
 input_text = scrolledtext.ScrolledText(root, width=100, height=15)
 input_text.pack()
 
 tk.Button(root, text="Hitung Lembur", command=hitung_lembur).pack()
 
+# Output section
 tk.Label(root, text="Hasil:").pack()
 output_text = scrolledtext.ScrolledText(root, width=100, height=15)
 output_text.pack()
 
+# Run the GUI
 root.mainloop()
